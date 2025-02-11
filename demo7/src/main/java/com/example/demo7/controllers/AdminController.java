@@ -6,17 +6,20 @@ import com.example.demo7.models.Personnel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
 public class AdminController {
+
 
     @FXML private TableView<Personnel> tableUsers;
     @FXML private TableColumn<Personnel, Integer> colUserId;
@@ -28,6 +31,8 @@ public class AdminController {
     @FXML private Button btnPromoteAdmin;
     @FXML private Button btnDowngradeToEmployee;
     @FXML private Button btnDeleteUser;
+    @FXML private Button btnAddUser;
+
 
     @FXML private TableView<Mission> tableMissions;
     @FXML private TableColumn<Mission, Integer> colMissionId;
@@ -151,6 +156,7 @@ public class AdminController {
         }
     }
 
+
     @FXML
     private void handleAddMission() {
         String nom = txtMissionName.getText();
@@ -206,10 +212,12 @@ public class AdminController {
         Mission mission = comboMissions.getSelectionModel().getSelectedItem();
         if (personnel != null && mission != null) {
             DatabaseConnection.assignPersonnelToMission(personnel.getId(), mission.getId());
+            DatabaseConnection.updateMissionStatus(mission.getId(), "Planifiée");
             System.out.println("Affectation réussie !");
         }
         loadMissionData();
     }
+
 
     @FXML
     private void handleRetirerMission() {
@@ -239,4 +247,6 @@ public class AdminController {
             e.printStackTrace();
         }
     }
+
+
 }

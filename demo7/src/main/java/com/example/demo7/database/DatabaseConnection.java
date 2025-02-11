@@ -71,6 +71,7 @@ public class DatabaseConnection {
 
 
     public static List<Mission> getMissions() {
+        updateMissionsStatus();
         List<Mission> missions = new ArrayList<>();
         String sql = "SELECT ID_Mission, Nom, Description, Date_Debut, Duree, Statut FROM mission";
 
@@ -130,6 +131,21 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             System.err.println("❌ Erreur lors de la suppression de l'utilisateur : " + e.getMessage());
         }
+    }
+
+    public static void addUser(String nom, String prenom, String email, String role) {
+        String sql = "INSERT INTO personnel (nom, prenom, email, role) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, nom);
+            stmt.setString(2, prenom);
+            stmt.setString(3, email);
+            stmt.setString(4, role);
+            stmt.executeUpdate();
+            System.out.println("✅ Personnel ajouté avec succès !");
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de l'ajout du personnel : " + e.getMessage());
+        }
+
     }
 
 
@@ -218,4 +234,37 @@ public class DatabaseConnection {
             System.err.println("❌ Erreur lors du retrait de l'employé de la mission : " + e.getMessage());
         }
     }
+    // Methode pour changer le statut d'une mission
+    public static void updateMissionStatus(int missionId, String status) {
+        String sql = "UPDATE mission SET Statut = ? WHERE ID_Mission = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, missionId);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("✅ Mission mise à jour en statut '" + status + "' !");
+            } else {
+                System.out.println("❌ Aucune mission trouvée avec cet ID.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la mise à jour de la mission : " + e.getMessage());
+        }
+    }
+    // Redefinition méthode pour changer le statut en cours
+
+    public static void updateMissionsStatus() {
+        String sql = "UPDATE mission SET Statut = 'En Cours' WHERE Statut = 'Planifiée' AND Date_Debut = CURDATE()";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("✅ " + rowsUpdated + " Missions mises à jour en statut 'En Cours'.");
+            } else {
+                System.out.println("❌ Aucune mission à mettre à jour.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la mise à jour des missions : " + e.getMessage());
+        }
+    }
+
 }
