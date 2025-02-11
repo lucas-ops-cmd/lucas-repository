@@ -32,6 +32,7 @@
                         <Button text="Passer en Administrateur" fx:id="btnPromoteAdmin" onAction="#handlePromoteAdmin"/>
                         <Button text="Rétrograder en Employé" fx:id="btnDowngradeToEmployee" onAction="#handleDowngradeToEmployee"/>
                         <Button text="Supprimer l'Utilisateur" fx:id="btnDeleteUser" onAction="#handleDeleteUser"/>
+                        <Button text="Ajouter un Utilisateur" fx:id="btnAddEmployee" onAction="#handleAddEmployee"/>
                     </HBox>
                 </VBox>
             </Tab>

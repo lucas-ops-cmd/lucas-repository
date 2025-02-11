@@ -71,7 +71,7 @@ public class DatabaseConnection {
 
 
     public static List<Mission> getMissions() {
-        updateMissionsStatus();
+        updateMissionsStatus(); // Changer le statut des missions
         List<Mission> missions = new ArrayList<>();
         String sql = "SELECT ID_Mission, Nom, Description, Date_Debut, Duree, Statut FROM mission";
 
@@ -133,19 +133,25 @@ public class DatabaseConnection {
         }
     }
 
-    public static void addUser(String nom, String prenom, String email, String role) {
-        String sql = "INSERT INTO personnel (nom, prenom, email, role) VALUES (?, ?, ?, ?)";
+    // Ajouter personnel
+    public static void addEmployee(String nom, String prenom, String email, String motDePasse) {
+
+
+        String sql = "INSERT INTO personnel (Nom, Prenom, Date_Entree_Ent, Mot_De_Passe, Nom_Role, Email) VALUES (?, ?, CURRENT_DATE, ?, 'Personnel', ?)";
+
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setString(1, nom);
             stmt.setString(2, prenom);
-            stmt.setString(3, email);
-            stmt.setString(4, role);
+
+            stmt.setString(3, motDePasse);
+            stmt.setString(4, email);  //
+
+            // Exécuter la requête
             stmt.executeUpdate();
             System.out.println("✅ Personnel ajouté avec succès !");
         } catch (SQLException e) {
             System.err.println("❌ Erreur lors de l'ajout du personnel : " + e.getMessage());
         }
-
     }
 
 
@@ -250,7 +256,7 @@ public class DatabaseConnection {
             System.err.println("❌ Erreur lors de la mise à jour de la mission : " + e.getMessage());
         }
     }
-    // Redefinition méthode pour changer le statut en cours
+    //  Méthode pour changer le statut en cours des missions
 
     public static void updateMissionsStatus() {
         String sql = "UPDATE mission SET Statut = 'En Cours' WHERE Statut = 'Planifiée' AND Date_Debut = CURDATE()";

@@ -15,6 +15,10 @@ import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -31,7 +35,8 @@ public class AdminController {
     @FXML private Button btnPromoteAdmin;
     @FXML private Button btnDowngradeToEmployee;
     @FXML private Button btnDeleteUser;
-    @FXML private Button btnAddUser;
+    @FXML private Button btnAddEmployee;
+
 
 
     @FXML private TableView<Mission> tableMissions;
@@ -109,6 +114,7 @@ public class AdminController {
         personnelList.setAll(DatabaseConnection.getPersonnels());
         tableUsers.setItems(personnelList);
         comboUsers.setItems(personnelList);
+        tableUsers.refresh();
     }
 
     private void loadMissionData() {
@@ -156,6 +162,28 @@ public class AdminController {
         }
     }
 
+    @FXML
+    private void handleAddEmployee() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo7/add-employee-view.fxml"));
+
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Add Employee");
+
+            Stage mainStage = (Stage) btnAddEmployee.getScene().getWindow();
+            stage.setX(mainStage.getX() + mainStage.getWidth() / 2 - stage.getWidth() / 2);
+            stage.setY(mainStage.getY() + mainStage.getHeight() / 2 - stage.getHeight() / 2);
+
+            stage.show();
+        } catch (IOException e) {
+            System.err.println("❌ Error: Failed to open the modal.");
+            e.printStackTrace();
+        }
+
+    }
 
     @FXML
     private void handleAddMission() {
@@ -212,7 +240,9 @@ public class AdminController {
         Mission mission = comboMissions.getSelectionModel().getSelectedItem();
         if (personnel != null && mission != null) {
             DatabaseConnection.assignPersonnelToMission(personnel.getId(), mission.getId());
+            // When a personal assigned change status to Planifiee
             DatabaseConnection.updateMissionStatus(mission.getId(), "Planifiée");
+            mission.setStatut("Planifiée");
             System.out.println("Affectation réussie !");
         }
         loadMissionData();
