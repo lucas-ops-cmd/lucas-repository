@@ -61,8 +61,9 @@
                         <Label text="Durée (jours):"/>
                         <TextField fx:id="txtMissionDuration"/>
 
-                        <Label text="Statut de la mission:"/>
-                        <ComboBox fx:id="comboMissionStatus"/>
+
+                        <!--                        <Label text="Statut de la mission:"/>-->
+<!--                        <ComboBox fx:id="comboMissionStatus"/>-->
 
                         <HBox spacing="10">
                             <Button text="Ajouter Mission" fx:id="btnAddMission" onAction="#handleAddMission"/>
@@ -77,7 +78,24 @@
             <Tab text="Affectation des Missions">
                 <VBox spacing="10" style="-fx-padding: 10;">
                     <Label text="Sélectionnez une mission :"/>
-                    <ComboBox fx:id="comboMissions"/>
+                    <ComboBox fx:id="comboMissions" onAction="#loadMissionCompetences"/>
+
+                    <!--Form to select competences and Nb of person required -->
+                    <Label text="Compétence requise:"/>
+                    <HBox spacing="10">
+                        <ComboBox fx:id="comboCompetences"/>
+                        <TextField fx:id="txtNbrPerson" promptText="Nombre de personnes requises"/>
+                        <Button text="Ajouter" onAction="#handleAddCompetence"/>
+                        <Button text="Retirer" onAction="#handleDeleteCompetence"/>
+                    </HBox>
+
+                    <!--Display selected competences-->
+                    <TableView fx:id="tableCompetences">
+                        <columns>
+                            <TableColumn text="Compétence" fx:id="colCompetence"/>
+                            <TableColumn text="Nombre de personnes requises" fx:id="colNbrPerson"/>
+                        </columns>
+                    </TableView>
 
                     <Label text="Affecter/Retirer un employé :"/>
                     <ComboBox fx:id="comboUsers"/>
