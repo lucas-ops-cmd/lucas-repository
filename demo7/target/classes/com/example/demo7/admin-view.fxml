@@ -61,6 +61,9 @@
                         <Label text="Durée (jours):"/>
                         <TextField fx:id="txtMissionDuration"/>
 
+                        <Label text="Nombre total de personnels requis:"/>
+                        <TextField fx:id="txtMissionNbrTotalRequis"/>
+
 
                         <!--                        <Label text="Statut de la mission:"/>-->
 <!--                        <ComboBox fx:id="comboMissionStatus"/>-->

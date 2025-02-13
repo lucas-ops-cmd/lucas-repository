@@ -169,12 +169,13 @@ public class DatabaseConnection {
         }
     }
 
-    public static void addMission(String nom, String description, LocalDate dateDebut, int duree) {
-        String sql = "INSERT INTO mission (Nom, Date_Debut, Duree, Statut) VALUES (?, ?, ?, 'Préparation')";
+    public static void addMission(String nom, String description, LocalDate dateDebut, int duree, int nbrTotalRequis) {
+        String sql = "INSERT INTO mission (Nom, Date_Debut, Duree, Statut, Nombre_Total_Requis) VALUES (?, ?, ?, 'Préparation', ?)";
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setString(1, nom);
             stmt.setDate(2, Date.valueOf(dateDebut));  // Conversion LocalDate → SQL Date
             stmt.setInt(3, duree);
+            stmt.setInt(4, nbrTotalRequis);
             stmt.executeUpdate();
 
 
@@ -187,7 +188,7 @@ public class DatabaseConnection {
         }
     }
 
-    // Afficher les competences dans la combobox
+    // Afficher les competences non déjà choisis dans la combobox
     public static ObservableList<String> getCompetences(int missionId) {
         String sql = "SELECT c.Code_Competence " +
                 "FROM competence c " +
@@ -246,7 +247,6 @@ public class DatabaseConnection {
             stmt.setInt(2, missionId);
             stmt.setInt(3, nbrPerRequis);
             stmt.executeUpdate();
-            updateTotalRequiredForMission(missionId);
             System.out.println("✅ Competence added to mission successfully!");
         } catch (SQLException e) {
             System.err.println("❌ Error adding competence to mission: " + e.getMessage());
@@ -267,26 +267,7 @@ public class DatabaseConnection {
     }
 
 
-    // Changer le nombre total de personnel requis
-    public static void updateTotalRequiredForMission(int missionId) {
-        String sql = "SELECT SUM(Nombre_Requis) FROM necessiter WHERE ID_Mission = ?";
-        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
-            stmt.setInt(1, missionId);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                int totalRequired = rs.getInt(1);
-                String updateSql = "UPDATE mission SET Nombre_Total_Requis = ? WHERE ID_Mission = ?";
-                try (PreparedStatement updateStmt = getConnection().prepareStatement(updateSql)) {
-                    updateStmt.setInt(1, totalRequired);
-                    updateStmt.setInt(2, missionId);
-                    updateStmt.executeUpdate();
-                    System.out.println("✅ Nombre total requis "+totalRequired+" updated for mission " + missionId);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("❌ Error updating total required for mission: " + e.getMessage());
-        }
-    }
+
 
 
     public static String getPersonnelAffecte(int missionId) {
@@ -347,6 +328,31 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             System.err.println("❌ Erreur lors du retrait de l'employé de la mission : " + e.getMessage());
         }
+
+    }
+
+    // Methode pour valider une mission
+    public static Boolean validateMissionStatus(int missionId) {
+        String sql = "SELECT n.ID_Mission FROM necessiter n "
+                + "LEFT JOIN affecter a ON n.ID_Mission = a.ID_Mission "
+                + "LEFT JOIN posseder p ON a.ID_Personnel = p.ID_Personnel AND n.Code_Competence = p.Code_Competence "
+                + "GROUP BY n.ID_Mission "
+                + "HAVING COUNT(DISTINCT a.ID_Personnel) >= (SELECT SUM(n2.Nombre_Requis) FROM necessiter n2 WHERE n2.ID_Mission = n.ID_Mission) "
+                + "AND COUNT(DISTINCT a.ID_Personnel) = (SELECT Nombre_Total_Requis FROM mission WHERE mission.ID_Mission = n.ID_Mission)";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                int missionIdValid = resultSet.getInt("ID_Mission");
+                System.out.println("Mission " + missionIdValid + " is now validated and set to 'En Planifiée'.");
+                return true;
+            } else {
+                System.out.println("❌ Mission not validated yet.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error validating mission status: " + e.getMessage());
+        }
+        return false;
     }
 
     // Methode pour changer le statut d'une mission

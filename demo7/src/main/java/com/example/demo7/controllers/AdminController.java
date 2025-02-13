@@ -60,6 +60,7 @@ public class AdminController {
     @FXML private TextField txtMissionDuration;
     @FXML private TableColumn<Mission, String> colMissionPersonnel;
     @FXML private TableColumn<Mission, String> colMissionStatut;
+    @FXML private TextField txtMissionNbrTotalRequis;
 
     @FXML private TextField txtNbrPerson;
     @FXML private ComboBox<String> comboCompetences;
@@ -187,13 +188,12 @@ public class AdminController {
     private void handleAddEmployee() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo7/add-employee-view.fxml"));
-
             Parent root = loader.load();
 
             Stage stage = new Stage();
             stage.setScene(new Scene(root));
-            stage.setTitle("Add Employee");
 
+            stage.setTitle("Add Employee");
             Stage mainStage = (Stage) btnAddEmployee.getScene().getWindow();
             stage.setX(mainStage.getX() + mainStage.getWidth() / 2 - stage.getWidth() / 2);
             stage.setY(mainStage.getY() + mainStage.getHeight() / 2 - stage.getHeight() / 2);
@@ -212,6 +212,7 @@ public class AdminController {
         String nom = txtMissionName.getText();
         LocalDate dateDebut = dpMissionStartDate.getValue();
         int duree;
+        int nbrTotalRequis;
 
         try {
             duree = Integer.parseInt(txtMissionDuration.getText());
@@ -225,8 +226,14 @@ public class AdminController {
             return;
         }
 
-        DatabaseConnection.addMission(nom, "Description automatique", dateDebut, duree);
-        loadCompetences();
+        try {
+            nbrTotalRequis = Integer.parseInt(txtMissionNbrTotalRequis.getText());
+        } catch (NumberFormatException e) {
+            System.err.println("❌ Erreur : Le Nombre total requis  doit être un nombre valide !");
+            return;
+        }
+
+        DatabaseConnection.addMission(nom, "Description automatique", dateDebut, duree, nbrTotalRequis);
         loadMissionData();
     }
 
@@ -253,8 +260,9 @@ public class AdminController {
         }
 
         DatabaseConnection.addCompetenceToMission(selectedCompetence, nbrPerRequis, mission.getId());
-        DatabaseConnection.updateTotalRequiredForMission(mission.getId());
-        
+        if (DatabaseConnection.validateMissionStatus(mission.getId())) {
+            DatabaseConnection.updateMissionStatus(mission.getId(), "Planifié");
+        }
         loadCompetences();
         loadMissionCompetences();
 
@@ -315,9 +323,9 @@ public class AdminController {
         Mission mission = comboMissions.getSelectionModel().getSelectedItem();
         if (personnel != null && mission != null) {
             DatabaseConnection.assignPersonnelToMission(personnel.getId(), mission.getId());
-
-                //  Change status to Planifiee
-               DatabaseConnection.updateMissionStatus(mission.getId(), "Planifiée");
+            if (DatabaseConnection.validateMissionStatus(mission.getId())) {
+                DatabaseConnection.updateMissionStatus(mission.getId(), "Planifiée");
+            }
 
             System.out.println("Affectation réussie !");
         }
