@@ -2,6 +2,8 @@ package com.example.demo7.database;
 
 import com.example.demo7.models.Mission;
 import com.example.demo7.models.Personnel;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -71,6 +73,7 @@ public class DatabaseConnection {
 
 
     public static List<Mission> getMissions() {
+        updateMissionsStatus(); // Changer le statut des missions
         List<Mission> missions = new ArrayList<>();
         String sql = "SELECT ID_Mission, Nom, Description, Date_Debut, Duree, Statut FROM mission";
 
@@ -132,6 +135,26 @@ public class DatabaseConnection {
         }
     }
 
+    // Ajouter personnel
+    public static void addEmployee(String nom, String prenom, String email, String motDePasse) {
+
+        String sql = "INSERT INTO personnel (Nom, Prenom, Date_Entree_Ent, Mot_De_Passe, Nom_Role, Email) VALUES (?, ?, CURRENT_DATE, ?, 'Personnel', ?)";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, nom);
+            stmt.setString(2, prenom);
+
+            stmt.setString(3, motDePasse);
+            stmt.setString(4, email);  //
+
+            // Exécuter la requête
+            stmt.executeUpdate();
+            System.out.println("✅ Personnel ajouté avec succès !");
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de l'ajout du personnel : " + e.getMessage());
+        }
+    }
+
 
     // 🔹 Modifier le rôle d'un employé
     public static void updateRole(int personnelId, String newRole) {
@@ -146,18 +169,106 @@ public class DatabaseConnection {
         }
     }
 
-    public static void addMission(String nom, String description, LocalDate dateDebut, int duree) {
-        String sql = "INSERT INTO mission (Nom, Date_Debut, Duree, Statut) VALUES (?, ?, ?, 'Préparation')";
+    public static void addMission(String nom, String description, LocalDate dateDebut, int duree, int nbrTotalRequis) {
+        String sql = "INSERT INTO mission (Nom, Date_Debut, Duree, Statut, Nombre_Total_Requis) VALUES (?, ?, ?, 'Préparation', ?)";
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setString(1, nom);
             stmt.setDate(2, Date.valueOf(dateDebut));  // Conversion LocalDate → SQL Date
             stmt.setInt(3, duree);
+            stmt.setInt(4, nbrTotalRequis);
             stmt.executeUpdate();
-            System.out.println("✅ Mission ajoutée avec succès !");
+
+
+            System.out.println("✅ Mission: " + nom + " ajoutée avec succès !");
+
+
         } catch (SQLException e) {
             System.err.println("❌ Erreur lors de l'ajout de la mission : " + e.getMessage());
+
         }
     }
+
+    // Afficher les competences non déjà choisis dans la combobox
+    public static ObservableList<String> getCompetences(int missionId) {
+        String sql = "SELECT c.Code_Competence " +
+                "FROM competence c " +
+                "WHERE c.Code_Competence NOT IN (" +
+                "    SELECT n.Code_Competence FROM necessiter n WHERE n.ID_Mission = ?" +
+                ")";
+
+        ObservableList<String> competences = FXCollections.observableArrayList();
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, missionId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                competences.add(rs.getString("Code_Competence"));
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error fetching unassigned competences: " + e.getMessage());
+        }
+
+        return competences;
+    }
+
+    //Afficher les competence de la mission choisis
+    public static ObservableList<String[]> getMissionCompetences(int missionId) {
+        String sql = "SELECT c.Code_Competence, n.Nombre_Requis " +
+                "FROM necessiter n " +
+                "JOIN competence c ON n.Code_Competence = c.Code_Competence " +
+                "WHERE n.ID_Mission = ? GROUP BY c.Code_Competence, n.Nombre_Requis";
+        ObservableList<String[]> competences = FXCollections.observableArrayList();
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, missionId); // Set the mission ID as parameter
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                String[] competenceData = new String[2];
+                competenceData[0] = rs.getString("Code_Competence");
+                competenceData[1] = String.valueOf(rs.getInt("Nombre_Requis"));
+                competences.add(competenceData);
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error fetching competences for mission: " + e.getMessage());
+        }
+
+        return competences;
+    }
+
+
+    // Ajouter competences à mission
+    public static void addCompetenceToMission(String competenceCode, int nbrPerRequis, int missionId) {
+        String sql = "INSERT INTO necessiter (Code_Competence, ID_Mission, Nombre_Requis) VALUES (?, ?, ?)";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, competenceCode);
+            stmt.setInt(2, missionId);
+            stmt.setInt(3, nbrPerRequis);
+            stmt.executeUpdate();
+            System.out.println("✅ Competence added to mission successfully!");
+        } catch (SQLException e) {
+            System.err.println("❌ Error adding competence to mission: " + e.getMessage());
+        }
+    }
+
+    // Supprimer competence de mission
+    public static void removeCompetenceFromMission(int missionId, String competenceCode) {
+        String sql = "DELETE FROM necessiter WHERE Code_Competence = ? AND ID_Mission = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, competenceCode);
+            stmt.setInt(2, missionId);
+            stmt.executeUpdate();
+            System.out.println("✅ Compétence: " + competenceCode + " retiré de la mission: "+ missionId +" !");
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors du retrait de la compétence " + competenceCode + "de la mission : "+ missionId + e.getMessage());
+        }
+    }
+
+
+
+
 
     public static String getPersonnelAffecte(int missionId) {
         String sql = "SELECT p.Nom, p.Prenom FROM personnel p " +
@@ -217,5 +328,66 @@ public class DatabaseConnection {
         } catch (SQLException e) {
             System.err.println("❌ Erreur lors du retrait de l'employé de la mission : " + e.getMessage());
         }
+
     }
+
+    // Methode pour valider une mission
+    public static Boolean validateMissionStatus(int missionId) {
+        String sql = "SELECT n.ID_Mission FROM necessiter n "
+                + "LEFT JOIN affecter a ON n.ID_Mission = a.ID_Mission "
+                + "LEFT JOIN posseder p ON a.ID_Personnel = p.ID_Personnel AND n.Code_Competence = p.Code_Competence "
+                + "GROUP BY n.ID_Mission "
+                + "HAVING COUNT(DISTINCT a.ID_Personnel) >= (SELECT SUM(n2.Nombre_Requis) FROM necessiter n2 WHERE n2.ID_Mission = n.ID_Mission) "
+                + "AND COUNT(DISTINCT a.ID_Personnel) = (SELECT Nombre_Total_Requis FROM mission WHERE mission.ID_Mission = n.ID_Mission)";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                int missionIdValid = resultSet.getInt("ID_Mission");
+                System.out.println("Mission " + missionIdValid + " is now validated and set to 'En Planifiée'.");
+                return true;
+            } else {
+                System.out.println("❌ Mission not validated yet.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Error validating mission status: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // Methode pour changer le statut d'une mission
+    public static void updateMissionStatus(int missionId, String status) {
+        String sql = "UPDATE mission SET Statut = ? WHERE ID_Mission = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, missionId);
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("✅ Mission mise à jour en statut '" + status + "' !");
+            } else {
+                System.out.println("❌ Aucune mission trouvée avec cet ID.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la mise à jour de la mission : " + e.getMessage());
+        }
+    }
+
+    //  Méthode pour changer le statut en cours des missions
+    public static void updateMissionsStatus() {
+        String sql = "UPDATE mission SET Statut = 'En Cours' WHERE Statut = 'Planifiée' AND Date_Debut = CURDATE()";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("✅ " + rowsUpdated + " Missions mises à jour en statut 'En Cours'.");
+            } else {
+                System.out.println("❌ Aucune mission à mettre à jour.");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la mise à jour des missions : " + e.getMessage());
+        }
+    }
+
+
+
 }

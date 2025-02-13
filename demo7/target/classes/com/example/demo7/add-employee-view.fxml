@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.demo7.controllers.AddEmployeeController">
+    <center>
+        <VBox spacing="10" style="-fx-padding: 10;">
+            <Label text="Nom:"/>
+            <TextField fx:id="txtEmployeeNom" promptText="Entrer Nom"/>
+
+            <Label text="Prénom:"/>
+            <TextField fx:id="txtEmployeePrenom" promptText="Entrer Prénom"/>
+
+            <Label text="Email:"/>
+            <TextField fx:id="txtEmployeeEmail" promptText="Entrer Email"/>
+
+            <!-- Added Password Field -->
+            <Label text="Mot de Passe:"/>
+            <PasswordField fx:id="txtEmployeeMotDePasse" promptText="Entrer Mot de Passe"/>
+
+            <HBox spacing="10">
+                <Button text="Ajouter" fx:id="btnAddEmployee" onAction="#handleAddEmployee"/>
+                <Button text="Annuler" fx:id="btnCancel" onAction="#handleCancel"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
