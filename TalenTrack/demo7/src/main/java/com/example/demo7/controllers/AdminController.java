@@ -54,6 +54,16 @@ public class AdminController {
     @FXML private TableColumn<Mission, Integer> colDuree;
     @FXML private TableColumn<Mission, String> colMissionCompetences;
 
+    // TableView et TableColumn pour les formations
+    @FXML private TableView<Mission> tableFormations;
+    @FXML private TableColumn<Mission, Integer> colFormationId;
+    @FXML private TableColumn<Mission, String> colFormationNom;
+    @FXML private TableColumn<Mission, Date> colDateDebutFor;
+    @FXML private TableColumn<Mission, String> colFormationPersonnel;
+    @FXML private TableColumn<Mission, String> colFormationStatut;
+    @FXML private TableColumn<Mission, Integer> colDureeFor;
+    @FXML private TableColumn<Mission, String> colFormationCompetences;
+
     // Boutons pour la gestion des missions
     @FXML private Button btnAddMission;
     @FXML private Button btnUpdateMission;
@@ -89,7 +99,7 @@ public class AdminController {
     private ObservableList<Personnel> personnelList = FXCollections.observableArrayList();
     private ObservableList<Mission> missionList = FXCollections.observableArrayList();
     private ObservableList<String[]> competencesList = FXCollections.observableArrayList();
-
+    private ObservableList<Mission> formationList = FXCollections.observableArrayList();
     /**
      * Méthode d'initialisation appelée après le chargement du fichier FXML.
      * Cette méthode configure les colonnes des TableView et charge les données initiales.
@@ -109,14 +119,34 @@ public class AdminController {
         colDateDebut.setCellValueFactory(cellData -> cellData.getValue().dateDebutProperty());
         colDuree.setCellValueFactory(cellData -> cellData.getValue().dureeProperty().asObject());
 
+
         // Configuration de la colonne des compétences des missions
         colMissionCompetences.setCellValueFactory(cellData -> {
             String competence = DatabaseConnection.getCompetenceMission(cellData.getValue().getId());
             return new SimpleStringProperty(competence);
         });
 
+        // Configuration de la colonne des compétences des missions
+        colMissionCompetences.setCellValueFactory(cellData -> {
+            String competence = DatabaseConnection.getCompetenceMission(cellData.getValue().getId());
+            return new SimpleStringProperty(competence);
+        });
+
+        // Configuration des colonnes formations
+        colFormationId.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
+        colFormationNom.setCellValueFactory(cellData -> cellData.getValue().nomProperty());
+        colDateDebutFor.setCellValueFactory(cellData -> cellData.getValue().dateDebutProperty());
+        colDureeFor.setCellValueFactory(cellData -> cellData.getValue().dureeProperty().asObject());
+        colFormationStatut.setCellValueFactory(cellData -> cellData.getValue().statutProperty());
+        // Configuration de la colonne des compétences des formations
+        colFormationCompetences.setCellValueFactory(cellData -> {
+            String competence = DatabaseConnection.getCompetenceMission(cellData.getValue().getId());
+            return new SimpleStringProperty(competence);
+        });
+
         loadPersonnelData();
         loadMissionData();
+        loadFormationData();
 
         // Configuration du ComboBox pour les utilisateurs
         comboUsers.setConverter(new javafx.util.StringConverter<>() {
@@ -141,6 +171,12 @@ public class AdminController {
         // Configuration des colonnes pour les compétences
         colCompetence.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()[0]));
         colNbrPerson.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()[1]));
+
+        // Configuration de la colonne du personnel affecté à une formation
+        colFormationPersonnel.setCellValueFactory(cellData -> {
+            String personnels = DatabaseConnection.getPersonnelAffecte(cellData.getValue().getId());
+            return new SimpleStringProperty(personnels);
+        });
     }
 
     /**
@@ -157,7 +193,7 @@ public class AdminController {
      * Méthode pour charger les données des missions.
      */
     private void loadMissionData() {
-        missionList.setAll(DatabaseConnection.getMissions());
+        missionList.setAll(DatabaseConnection.getMissions("Mission"));
         tableMissions.setItems(missionList);
         comboMissions.setItems(missionList);
         tableMissions.refresh();
@@ -182,6 +218,16 @@ public class AdminController {
         competencesList.setAll(DatabaseConnection.getMissionCompetences(mission.getId()));
         tableCompetences.setItems(competencesList);
         loadCompetences();
+    }
+
+    /**
+     * Méthode pour charger les données des formations.
+     */
+    private void loadFormationData() {
+        formationList.setAll(DatabaseConnection.getMissions("Formation"));
+        tableFormations.setItems(formationList);
+//        comboMissions.setItems(formationList);
+        tableFormations.refresh();
     }
 
     /**

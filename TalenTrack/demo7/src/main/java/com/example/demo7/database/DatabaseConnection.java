@@ -111,23 +111,27 @@ public class DatabaseConnection {
      *
      * @return Une liste des missions.
      */
-    public static List<Mission> getMissions() {
+    public static List<Mission> getMissions(String type) {
         updateMissionsStatus(); // Met à jour le statut des missions
         List<Mission> missions = new ArrayList<>();
-        String sql = "SELECT ID_Mission, Nom, Description, Date_Debut, Duree, Statut FROM mission";
+        String sql = "SELECT ID_Mission, Nom, Description, Date_Debut, Duree, Statut, Type FROM mission WHERE Type = ?";
 
-        try (PreparedStatement stmt = getConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                missions.add(new Mission(
-                        rs.getInt("ID_Mission"),
-                        rs.getString("Nom"),
-                        rs.getString("Description"),
-                        rs.getDate("Date_Debut").toLocalDate(),  // Conversion SQL -> LocalDate
-                        rs.getInt("Duree"),
-                        rs.getString("Statut")
-                ));
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)){
+            stmt.setString(1, type);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    missions.add(new Mission(
+                            rs.getInt("ID_Mission"),
+                            rs.getString("Nom"),
+                            rs.getString("Description"),
+                            rs.getDate("Date_Debut").toLocalDate(),  // Conversion SQL -> LocalDate
+                            rs.getInt("Duree"),
+                            rs.getString("Statut"),
+                            rs.getString("Type")
+                    ));
+                }
             }
+
         } catch (SQLException e) {
             System.err.println("❌ Erreur lors de la récupération des missions : " + e.getMessage());
         }
@@ -603,4 +607,7 @@ public class DatabaseConnection {
         }
         return personneSugereeList;
     }
+
+
+
 }
