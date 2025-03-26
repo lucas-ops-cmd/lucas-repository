@@ -241,13 +241,14 @@ public class DatabaseConnection {
      * @param duree         La durée de la mission.
      * @param nbrTotalRequis Le nombre total de personnes requises pour la mission.
      */
-    public static void addMission(String nom, String description, LocalDate dateDebut, int duree, int nbrTotalRequis) {
-        String sql = "INSERT INTO mission (Nom, Date_Debut, Duree, Statut, Nombre_Total_Requis) VALUES (?, ?, ?, 'Préparation', ?)";
+    public static void addMission(String nom, String description, LocalDate dateDebut, int duree, int nbrTotalRequis, String type) {
+        String sql = "INSERT INTO mission (Nom, Date_Debut, Duree, Statut, Nombre_Total_Requis, Type) VALUES (?, ?, ?, 'Préparation', ?, ?)";
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             stmt.setString(1, nom);
             stmt.setDate(2, Date.valueOf(dateDebut));  // Conversion LocalDate → SQL Date
             stmt.setInt(3, duree);
             stmt.setInt(4, nbrTotalRequis);
+            stmt.setString(5, type);
             stmt.executeUpdate();
 
             System.out.println("✅ Mission: " + nom + " ajoutée avec succès !");
@@ -263,7 +264,7 @@ public class DatabaseConnection {
      * @return Une liste observable des compétences non assignées.
      */
     public static ObservableList<String> getCompetences(int missionId) {
-        String sql = "SELECT c.Code_Competence " +
+        String sql = "SELECT c.Code_Competence, c.Nom_Competence " +
                 "FROM competence c " +
                 "WHERE c.Code_Competence NOT IN (" +
                 "    SELECT n.Code_Competence FROM necessiter n WHERE n.ID_Mission = ?" +
@@ -276,7 +277,7 @@ public class DatabaseConnection {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                competences.add(rs.getString("Code_Competence"));
+                competences.add(rs.getString("Nom_Competence"));
             }
         } catch (SQLException e) {
             System.err.println("❌ Error fetching unassigned competences: " + e.getMessage());
@@ -292,10 +293,10 @@ public class DatabaseConnection {
      * @return Une liste observable des compétences de la mission.
      */
     public static ObservableList<String[]> getMissionCompetences(int missionId) {
-        String sql = "SELECT c.Code_Competence, n.Nombre_Requis " +
+        String sql = "SELECT c.Code_Competence, c.Nom_Competence, n.Nombre_Requis " +
                 "FROM necessiter n " +
                 "JOIN competence c ON n.Code_Competence = c.Code_Competence " +
-                "WHERE n.ID_Mission = ? GROUP BY c.Code_Competence, n.Nombre_Requis";
+                "WHERE n.ID_Mission = ? GROUP BY c.Code_Competence, c.Nom_Competence, n.Nombre_Requis";
         ObservableList<String[]> competences = FXCollections.observableArrayList();
 
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
@@ -303,9 +304,10 @@ public class DatabaseConnection {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                String[] competenceData = new String[2];
+                String[] competenceData = new String[3];
                 competenceData[0] = rs.getString("Code_Competence");
-                competenceData[1] = String.valueOf(rs.getInt("Nombre_Requis"));
+                competenceData[1] = rs.getString("Nom_Competence");
+                competenceData[2] = String.valueOf(rs.getInt("Nombre_Requis"));
                 competences.add(competenceData);
             }
         } catch (SQLException e) {
