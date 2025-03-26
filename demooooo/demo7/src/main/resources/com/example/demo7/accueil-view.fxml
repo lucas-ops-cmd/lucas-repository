@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.demo7.controllers.AccueilController"
+            prefWidth="800" prefHeight="600"
+            style="-fx-background-color: #f0f8ff;">
+
+    <!-- Barre de navigation améliorée -->
+    <HBox spacing="20" alignment="CENTER_RIGHT"
+          style="-fx-padding: 10; -fx-background-color: #2c3e50;">
+        <children>
+            <Button fx:id="btnConnexion" text="Connexion" onAction="#onConnexionClick"
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 20;"/>
+        </children>
+    </HBox>
+
+    <!-- Positionnement du titre principal -->
+    <Label text="TalenTrack"
+           style="-fx-font-size: 48px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"
+           AnchorPane.topAnchor="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+           alignment="CENTER"/>
+
+</AnchorPane>

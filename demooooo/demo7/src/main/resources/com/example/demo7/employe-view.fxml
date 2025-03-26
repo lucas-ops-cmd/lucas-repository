@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.demo7.controllers.EmployeController"
+            prefWidth="800" prefHeight="600">
+
+    <!-- Titre -->
+    <top>
+        <Label text="Espace Employé" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    </top>
+
+    <center>
+        <VBox spacing="10" style="-fx-padding: 15;">
+
+        <!-- Liste des missions de l'employé -->
+            <Label text="Vos missions" style="-fx-font-size: 16px;"/>
+            <TableView fx:id="tableMissions">
+                <columns>
+                    <TableColumn fx:id="colMissionId" text="ID"/>
+                    <TableColumn fx:id="colMissionNom" text="Nom"/>
+                    <TableColumn text="date début" fx:id="colDateDebut" prefWidth="80"/>
+                    <TableColumn text="durée" fx:id="colDuree" prefWidth="50"/>
+                    <TableColumn fx:id="colMissionDesc" text="Description"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+    <!-- Bouton Retour -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 10;">
+            <Button text="Déconnexion" fx:id="btnRetourAccueil" onAction="#handleRetourAccueil"
+                    style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        </HBox>
+    </bottom>
+</BorderPane>

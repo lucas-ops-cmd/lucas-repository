@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.demo7.controllers.AdminController">
+
+    <!-- Titre Principal -->
+    <top>
+        <Label text="Espace Administrateur"
+               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-padding: 20; -fx-background-color: #2c3e50; -fx-text-fill: white;"
+               alignment="CENTER"/>
+    </top>
+
+    <!-- Contenu Central -->
+    <center>
+        <TabPane style="-fx-tab-min-width: 150; -fx-tab-max-width: 200; -fx-padding: 10;">
+
+            <!-- Onglet Gestion des Utilisateurs -->
+            <Tab text="Gestion des Utilisateurs">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <TableView fx:id="tableUsers" style="-fx-border-color: #ccc;">
+                        <columns>
+                            <TableColumn text="ID" fx:id="colUserId" prefWidth="100"/>
+                            <TableColumn text="Nom" fx:id="colUserNom" prefWidth="150"/>
+                            <TableColumn text="Prénom" fx:id="colUserPrenom" prefWidth="150"/>
+                            <TableColumn text="Email" fx:id="colUserEmail" prefWidth="200"/>
+                            <TableColumn text="Rôle" fx:id="colUserRole" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+
+                    <HBox spacing="10" alignment="CENTER">
+                        <Button text="Passer en Chef de Projet" fx:id="btnPromoteChef" onAction="#handlePromoteChef"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Button text="Passer en Administrateur" fx:id="btnPromoteAdmin" onAction="#handlePromoteAdmin"
+                                style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Button text="Rétrograder en Employé" fx:id="btnDowngradeToEmployee" onAction="#handleDowngradeToEmployee"
+                                style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Button text="Supprimer l'Utilisateur" fx:id="btnDeleteUser" onAction="#handleDeleteUser"
+                                style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Button text="Ajouter un Utilisateur" fx:id="btnAddEmployee" onAction="#handleAddEmployee"
+                                style="-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- Onglet Gestion des Missions -->
+            <Tab text="Gestion des Missions">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <TableView fx:id="tableMissions" style="-fx-border-color: #ccc;">
+                        <columns>
+                            <TableColumn text="ID" fx:id="colMissionId" prefWidth="50"/>
+                            <TableColumn text="Nom" fx:id="colMissionNom" prefWidth="150"/>
+                            <TableColumn text="date début" fx:id="colDateDebut" prefWidth="80"/>
+                            <TableColumn text="durée" fx:id="colDuree" prefWidth="50"/>
+                            <TableColumn text="Personnel Affecté" fx:id="colMissionPersonnel" prefWidth="400"/>
+                            <TableColumn text="Statut" fx:id="colMissionStatut" prefWidth="100"/>
+                            <TableColumn text="Compétences" fx:id="colMissionCompetences" prefWidth="600"/>
+                        </columns>
+                    </TableView>
+
+                    <VBox spacing="10">
+                        <Label text="Formulaire d'ajout et de modification de mission"
+                               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 5;"/>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Nom de la mission :" style="-fx-min-width: 150;"/>
+                            <TextField fx:id="txtMissionName" promptText="Nom de la mission" style="-fx-pref-width: 300;"/>
+                        </HBox>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Date de début :" style="-fx-min-width: 150;"/>
+                            <DatePicker fx:id="dpMissionStartDate"/>
+                        </HBox>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Durée (jours) :" style="-fx-min-width: 150;"/>
+                            <TextField fx:id="txtMissionDuration" promptText="Durée en jours" style="-fx-pref-width: 100;"/>
+                        </HBox>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Nombre total de personnels requis :" style="-fx-min-width: 250;"/>
+                            <TextField fx:id="txtMissionNbrTotalRequis" promptText="Nombre total" style="-fx-pref-width: 100;"/>
+                        </HBox>
+
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button text="Ajouter Mission" fx:id="btnAddMission" onAction="#handleAddMission"
+                                    style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <Button text="Modifier Mission" fx:id="btnUpdateMission" onAction="#handleUpdateMission"
+                                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <Button text="Supprimer Mission" fx:id="btnDeleteMission" onAction="#handleDeleteMission"
+                                    style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </Tab>
+
+            <!-- Onglet Affectation des Missions -->
+            <Tab text="Affectation des Missions">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <Label text="Affectation des Missions"
+                           style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 5;"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Sélectionnez une mission :" style="-fx-min-width: 200;"/>
+                        <ComboBox fx:id="comboMissions" style="-fx-pref-width: 300;" onAction="#loadMissionCompetences"/>
+                    </HBox>
+
+
+
+                    <Label text="Sugerer un employé :" style="-fx-font-weight: bold;"/>
+                    <Button text="Sugerer" fx:id="btnSugererPersonel" onAction="#handleSugererPersonnel"/>
+                    <ComboBox fx:id="comboPersoSugere"/>
+
+                    <Label text="Compétences requises :" style="-fx-font-weight: bold;"/>
+                    <HBox spacing="10">
+
+                        <ComboBox fx:id="comboCompetences" style="-fx-pref-width: 200;"
+                                  onAction="#loadCompetences"/>
+
+                        <TextField fx:id="txtNbrPerson" promptText="Nombre de personnes requises" style="-fx-pref-width: 100;"/>
+                        <Button text="Ajouter" onAction="#handleAddCompetence"
+                                style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+                        <Button text="Retirer" onAction="#handleDeleteCompetence"
+                                style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
+                    </HBox>
+
+                    <TableView fx:id="tableCompetences" style="-fx-border-color: #ccc;" >
+                        <columns>
+                            <TableColumn text="Compétence" fx:id="colCompetence" prefWidth="200"/>
+                            <TableColumn text="Nombre de personnes requises" fx:id="colNbrPerson" prefWidth="200"/>
+                        </columns>
+                    </TableView>
+
+                    <Label text="Affecter/Retirer un employé :" style="-fx-font-weight: bold;"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="comboUsers" style="-fx-pref-width: 200;"/>
+                        <Button text="Affecter" fx:id="btnAffecterMission" onAction="#handleAffecterMission"
+                                style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+                        <Button text="Retirer" fx:id="btnRetirerMission" onAction="#handleRetirerMission"
+                                style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+        </TabPane>
+    </center>
+
+    <!-- Bouton Retour -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-padding: 10;">
+            <Button text="Déconnexion" fx:id="btnRetourAccueil" onAction="#handleRetourAccueil"
+                    style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-weight: bold;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
