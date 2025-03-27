@@ -150,11 +150,11 @@ public class AdminController {
             return new SimpleStringProperty(competence);
         });
 
-//        // Configuration de la colonne des compétences des missions
-//        colMissionCompetences.setCellValueFactory(cellData -> {
-//            String competence = DatabaseConnection.getCompetenceMission(cellData.getValue().getId());
-//            return new SimpleStringProperty(competence);
-//        });
+        // Configuration de la colonne des compétences des missions
+        colMissionCompetences.setCellValueFactory(cellData -> {
+            String competence = DatabaseConnection.getCompetenceMission(cellData.getValue().getId());
+            return new SimpleStringProperty(competence);
+        });
 
         // Configuration des colonnes formations
         colFormationId.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
@@ -236,7 +236,7 @@ public class AdminController {
             Mission mission = comboMissions.getSelectionModel().getSelectedItem();
             ObservableList<String> competencesList = DatabaseConnection.getCompetences(mission.getId());
             comboCompetences.setItems(competencesList);
-        } else {
+        } else if (comboFormations.getSelectionModel().getSelectedItem() != null) {
             // Compétences Formation
             Mission formation = comboFormations.getSelectionModel().getSelectedItem();
             ObservableList<String> competencesFormationList = DatabaseConnection.getCompetences(formation.getId());
@@ -398,9 +398,9 @@ public class AdminController {
      */
     @FXML
     private void handleAddCompetence() {
-        String selectedCompetence = comboCompetencesFormation.getValue();
-        String nbrPersonText = txtNbrPersonFor.getText();
-        Mission mission = comboFormations.getSelectionModel().getSelectedItem();
+        String selectedCompetence = comboCompetences.getValue();
+        String nbrPersonText = txtNbrPerson.getText();
+        Mission mission = comboMissions.getSelectionModel().getSelectedItem();
 
         if (selectedCompetence == null || nbrPersonText.isEmpty()) {
             System.out.println("❌ Please fill in all fields!");
@@ -422,9 +422,13 @@ public class AdminController {
         if (DatabaseConnection.validateMissionStatus(mission.getId())) {
             DatabaseConnection.updateMissionStatus(mission.getId(), "Planifié");
         }
-        loadCompetences();
+
+
         loadMissionCompetences();
-        loadFormationData();
+        loadMissionData();
+        loadCompetences();
+
+
     }
 
     /**
@@ -446,9 +450,12 @@ public class AdminController {
         String selectedCompetence = selectedRow[0];
         DatabaseConnection.removeCompetenceFromMission(mission.getId(), selectedCompetence);
 
-        loadCompetences();
-        loadMissionCompetences();
+
         loadMissionData();
+        loadMissionCompetences();
+        loadCompetences();
+
+
     }
 
     /**
@@ -622,8 +629,10 @@ public class AdminController {
             DatabaseConnection.updateMissionStatus(formation.getId(), "Planifié");
         }
         loadCompetences();
+
         loadMissionCompetences();
         loadFormationData();
+
     }
 
     /**
@@ -645,11 +654,11 @@ public class AdminController {
         String selectedCompetence = selectedRow[0];
         DatabaseConnection.removeCompetenceFromMission(formation.getId(), selectedCompetence);
 
-        loadCompetences();
-        loadMissionCompetences();
-        loadFormationData();
-    }
 
+        loadFormationData();
+        loadMissionCompetences();
+        loadCompetences();
+    }
 
     /**
      * Méthode pour retourner à l'accueil.

@@ -324,19 +324,37 @@ public class DatabaseConnection {
      * @param nbrPerRequis   Le nombre de personnes requises pour cette compétence.
      * @param missionId      L'ID de la mission.
      */
-    public static void addCompetenceToMission(String competenceCode, int nbrPerRequis, int missionId) {
-        String sql = "INSERT INTO necessiter (Code_Competence, ID_Mission, Nombre_Requis) VALUES (?, ?, ?)";
+    public static void addCompetenceToMission(String nomCompetence, int nbrPerRequis, int missionId) {
+        String getCodeSql = "SELECT Code_Competence FROM competence WHERE Nom_Competence = ?";
+        String insertSql = "INSERT INTO necessiter (Code_Competence, ID_Mission, Nombre_Requis) VALUES (?, ?, ?)";
 
-        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
-            stmt.setString(1, competenceCode);
-            stmt.setInt(2, missionId);
-            stmt.setInt(3, nbrPerRequis);
-            stmt.executeUpdate();
-            System.out.println("✅ Competence added to mission successfully!");
+        Connection conn = getConnection(); // Ne pas fermer cette connexion ici !
+
+        try (
+                PreparedStatement getCodeStmt = conn.prepareStatement(getCodeSql)
+        ) {
+            getCodeStmt.setString(1, nomCompetence);
+            ResultSet rs = getCodeStmt.executeQuery();
+
+            if (rs.next()) {
+                String competenceCode = rs.getString("Code_Competence");
+
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                    insertStmt.setString(1, competenceCode);
+                    insertStmt.setInt(2, missionId);
+                    insertStmt.setInt(3, nbrPerRequis);
+                    insertStmt.executeUpdate();
+                    System.out.println("✅ Competence added to mission successfully!");
+                }
+            } else {
+                System.err.println("❌ No competence found with name: " + nomCompetence);
+            }
+
         } catch (SQLException e) {
             System.err.println("❌ Error adding competence to mission: " + e.getMessage());
         }
     }
+
 
     /**
      * Méthode pour supprimer une compétence d'une mission.
