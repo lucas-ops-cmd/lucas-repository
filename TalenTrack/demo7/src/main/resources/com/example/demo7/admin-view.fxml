@@ -240,7 +240,7 @@
                         <ComboBox fx:id="comboUsersFor" style="-fx-pref-width: 200;"/>
                         <Button text="Affecter" fx:id="btnAffecterFormation" onAction="#handleAffecterFormation"
                                 style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
-                        <Button text="Retirer" fx:id="btnRetirerFormation" onAction="#handleRetirerMission"
+                        <Button text="Retirer" fx:id="btnRetirerFormation" onAction="#handleRetirerFormation"
                                 style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
                     </HBox>
                 </VBox>

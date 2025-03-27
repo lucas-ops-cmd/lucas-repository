@@ -174,6 +174,7 @@ public class AdminController {
         loadPersonnelData();
         loadMissionData();
         loadFormationData();
+//        handleAssignCompetences();
 
         // Configuration du ComboBox pour les utilisateurs
         comboUsers.setConverter(new javafx.util.StringConverter<>() {
@@ -243,6 +244,8 @@ public class AdminController {
         tableMissions.setItems(missionList);
         comboMissions.setItems(missionList);
         tableMissions.refresh();
+//        handleAssignCompetences();
+
     }
 
     /**
@@ -291,8 +294,8 @@ public class AdminController {
         tableFormations.setItems(formationList);
         comboFormations.setItems(formationList);
         tableFormations.refresh();
+//        handleAssignCompetences();
     }
-
     /**
      * Méthode pour promouvoir un utilisateur au rôle de chef de projet.
      */
@@ -676,7 +679,7 @@ public class AdminController {
     }
 
     /**
-     * Méthode pour affecter une mission à un utilisateur.
+     * Méthode pour affecter une formation à un utilisateur.
      */
     @FXML
     private void handleAffecterFormation() {
@@ -691,6 +694,31 @@ public class AdminController {
         }
         loadFormationData();
     }
+
+    /**
+     * Méthode pour retirer une formation à un utilisateur.
+     **/
+
+    @FXML
+    private void handleRetirerFormation() {
+        Personnel personnel = comboUsersFor.getSelectionModel().getSelectedItem();
+        Mission formation = comboMissions.getSelectionModel().getSelectedItem();
+        if (personnel != null && formation != null) {
+            DatabaseConnection.removePersonnelFromMission(personnel.getId(), formation.getId());
+            System.out.println("Désaffectation réussie !");
+        }
+        loadFormationData();
+    }
+
+//    @FXML
+//    private void handleAssignCompetences() {
+//
+//        System.out.println("✅ Mise à jour des missions terminées...");
+//        DatabaseConnection.assignCompetencesMission();
+//        System.out.println("✅ Ajout des compétences aux employés...");
+//        DatabaseConnection.assignCompetencesMission();
+//    }
+
 
     /**
      * Méthode pour retourner à l'accueil.

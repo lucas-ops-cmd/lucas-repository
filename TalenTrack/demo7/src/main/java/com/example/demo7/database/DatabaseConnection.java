@@ -80,6 +80,23 @@ public class DatabaseConnection {
         return null;
     }
 
+    public static int getIdPersonnel(String email){
+
+        String sql = "SELECT ID_Personnel FROM personnel WHERE Email = ?";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("ID_Personnel");
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la récupération de l'ID de l'utilisateur pour la session : " + e.getMessage());
+        }
+        return -1;
+    }
+
+
     /**
      * Méthode pour récupérer la liste des employés.
      *
@@ -137,6 +154,35 @@ public class DatabaseConnection {
         }
         return missions;
     }
+
+    public static List<Mission> getMissionsPers(int idPersonnel) {
+        updateMissionsStatus(); // Changer le statut des missions
+        List<Mission> missions = new ArrayList<>();
+        String sql = "SELECT m.ID_Mission, Nom, Description, Date_Debut, Duree, Statut, Type " +
+                "FROM mission m JOIN affecter a ON m.ID_Mission=a.ID_Mission"+
+                " WHERE a.ID_Personnel= ? ";
+
+        try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
+            stmt.setInt(1, idPersonnel);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                missions.add(new Mission(
+                        rs.getInt("ID_Mission"),
+                        rs.getString("Nom"),
+                        rs.getString("Description"),
+                        rs.getDate("Date_Debut").toLocalDate(),  // Conversion SQL -> LocalDate
+                        rs.getInt("Duree"),
+                        rs.getString("Statut"),
+                        rs.getString("Type")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de la récupération des missions : " + e.getMessage());
+        }
+        return missions;
+    }
+
+
 
     /**
      * Méthode pour mettre à jour une mission (changer la durée et le statut).
@@ -629,5 +675,57 @@ public class DatabaseConnection {
     }
 
 
+    public static void assignCompetencesMission() {
+        String getCompletedMissionsSql = "SELECT m.ID_Mission FROM mission m WHERE m.Statut = 'Terminée'";
 
+        // Récupérer les missions terminées
+        String getCompetencesSql = "SELECT c.Code_Competence FROM competence c " +
+                "JOIN necessiter n ON c.Code_Competence = n.Code_Competence " +
+                "WHERE n.ID_Mission = ?";
+
+        String getEmployeesSql = "SELECT p.ID_Personnel FROM personnel p";
+
+        String insertCompetenceSql = "INSERT INTO posseder (ID_Personnel, Code_Competence) VALUES (?, ?)";
+        Connection conn = getConnection();
+
+        try (PreparedStatement stmt = conn.prepareStatement(getCompletedMissionsSql);
+             ResultSet missionsRS = stmt.executeQuery()) {
+
+            // Pour chaque mission terminée
+            while (missionsRS.next()) {
+                int missionId = missionsRS.getInt("ID_Mission");
+
+                // Récupérer les compétences associées à cette mission
+                try (PreparedStatement competenceStmt = conn.prepareStatement(getCompetencesSql)) {
+                    competenceStmt.setInt(1, missionId);
+                    ResultSet competencesRS = competenceStmt.executeQuery();
+
+                    // Pour chaque compétence associée à cette mission
+                    while (competencesRS.next()) {
+                        String competenceCode = competencesRS.getString("Code_Competence");
+
+                        // Récupérer tous les employés
+                        try (PreparedStatement employeesStmt = conn.prepareStatement(getEmployeesSql);
+                             ResultSet employeesRS = employeesStmt.executeQuery()) {
+
+                            // Ajouter la compétence à chaque employé
+                            while (employeesRS.next()) {
+                                int personnelId = employeesRS.getInt("ID_Personnel");
+
+                                // Insérer la compétence pour cet employé
+                                try (PreparedStatement insertStmt = conn.prepareStatement(insertCompetenceSql)) {
+                                    insertStmt.setInt(1, personnelId);
+                                    insertStmt.setString(2, competenceCode);
+                                    insertStmt.executeUpdate();
+                                    System.out.println("✅ Compétence " + competenceCode + " ajoutée à l'employé ID: " + personnelId);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Erreur lors de l'ajout des compétences aux employés : " + e.getMessage());
+        }
+    }
 }
