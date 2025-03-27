@@ -213,10 +213,6 @@
                         <ComboBox fx:id="comboFormations" style="-fx-pref-width: 300;" onAction="#loadMissionCompetences"/>
                     </HBox>
 
-                    <!-- Affectation des employées -->
-                    <Label text="Sugerer un employé :" style="-fx-font-weight: bold;"/>
-                    <Button text="Sugerer" fx:id="btnSugererPersonelFormation" onAction="#handleSugererPersonnel"/>
-                    <ComboBox fx:id="comboPersoSugereFormation"/>
 
                     <Label text="Sélectionner les compétences requises :" style="-fx-font-weight: bold;"/>
                     <HBox spacing="10">
@@ -242,7 +238,7 @@
 
                     <HBox spacing="10" alignment="CENTER_LEFT">
                         <ComboBox fx:id="comboUsersFor" style="-fx-pref-width: 200;"/>
-                        <Button text="Affecter" fx:id="btnAffecterFormation" onAction="#handleAffecterMission"
+                        <Button text="Affecter" fx:id="btnAffecterFormation" onAction="#handleAffecterFormation"
                                 style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
                         <Button text="Retirer" fx:id="btnRetirerFormation" onAction="#handleRetirerMission"
                                 style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>

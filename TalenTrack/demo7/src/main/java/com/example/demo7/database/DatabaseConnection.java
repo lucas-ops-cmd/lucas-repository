@@ -328,7 +328,7 @@ public class DatabaseConnection {
         String getCodeSql = "SELECT Code_Competence FROM competence WHERE Nom_Competence = ?";
         String insertSql = "INSERT INTO necessiter (Code_Competence, ID_Mission, Nombre_Requis) VALUES (?, ?, ?)";
 
-        Connection conn = getConnection(); // Ne pas fermer cette connexion ici !
+        Connection conn = getConnection();
 
         try (
                 PreparedStatement getCodeStmt = conn.prepareStatement(getCodeSql)

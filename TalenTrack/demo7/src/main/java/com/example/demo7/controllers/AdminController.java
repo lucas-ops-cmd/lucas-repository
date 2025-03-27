@@ -27,6 +27,7 @@ import java.util.Date;
 public class AdminController {
 
 
+
     // TableView et TableColumn pour les utilisateurs
     @FXML private TableView<Personnel> tableUsers;
     @FXML private TableColumn<Personnel, Integer> colUserId;
@@ -112,6 +113,7 @@ public class AdminController {
     //ComboBox pour selectionner formation, competence et user
     @FXML public ComboBox<Mission> comboFormations;
     @FXML public ComboBox<String> comboCompetencesFormation;
+    @FXML private ComboBox<Personnel> comboUsersFor;
 
     // TableView et TableColumn pour les compétences formation
     @FXML private TableView<String[]> tableCompetencesFormation;
@@ -124,6 +126,7 @@ public class AdminController {
     private ObservableList<String[]> competencesList = FXCollections.observableArrayList();
     private ObservableList<Mission> formationList = FXCollections.observableArrayList();
     private ObservableList<String[]> competencesFormationList = FXCollections.observableArrayList();
+    private ObservableList<Personnel> personnelFormationList = FXCollections.observableArrayList();
     /**
      * Méthode d'initialisation appelée après le chargement du fichier FXML.
      * Cette méthode configure les colonnes des TableView et charge les données initiales.
@@ -205,6 +208,19 @@ public class AdminController {
             String personnels = DatabaseConnection.getPersonnelAffecte(cellData.getValue().getId());
             return new SimpleStringProperty(personnels);
         });
+
+        // Configuration du ComboBox pour les utilisateurs formation
+        comboUsersFor.setConverter(new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(Personnel personnel) {
+                return personnel == null ? "" : personnel.getNom() + " " + personnel.getPrenom();
+            }
+
+            @Override
+            public Personnel fromString(String s) {
+                return null; // Non utilisé
+            }
+        });
     }
 
     /**
@@ -214,7 +230,9 @@ public class AdminController {
         personnelList.setAll(DatabaseConnection.getPersonnels());
         tableUsers.setItems(personnelList);
         comboUsers.setItems(personnelList);
+        comboUsersFor.setItems(personnelList);
         tableUsers.refresh();
+
     }
 
     /**
@@ -423,10 +441,10 @@ public class AdminController {
             DatabaseConnection.updateMissionStatus(mission.getId(), "Planifié");
         }
 
-
+        loadCompetences();
         loadMissionCompetences();
         loadMissionData();
-        loadCompetences();
+
 
 
     }
@@ -450,11 +468,9 @@ public class AdminController {
         String selectedCompetence = selectedRow[0];
         DatabaseConnection.removeCompetenceFromMission(mission.getId(), selectedCompetence);
 
-
-        loadMissionData();
-        loadMissionCompetences();
         loadCompetences();
-
+        loadMissionCompetences();
+        loadMissionData();
 
     }
 
@@ -628,10 +644,10 @@ public class AdminController {
         if (DatabaseConnection.validateMissionStatus(formation.getId())) {
             DatabaseConnection.updateMissionStatus(formation.getId(), "Planifié");
         }
-        loadCompetences();
 
+        loadCompetences();
         loadMissionCompetences();
-        loadFormationData();
+        loadMissionData();
 
     }
 
@@ -654,10 +670,26 @@ public class AdminController {
         String selectedCompetence = selectedRow[0];
         DatabaseConnection.removeCompetenceFromMission(formation.getId(), selectedCompetence);
 
-
-        loadFormationData();
-        loadMissionCompetences();
         loadCompetences();
+        loadMissionCompetences();
+        loadFormationData();
+    }
+
+    /**
+     * Méthode pour affecter une mission à un utilisateur.
+     */
+    @FXML
+    private void handleAffecterFormation() {
+        Personnel personnel = comboUsersFor.getSelectionModel().getSelectedItem();
+        Mission formation = comboFormations.getSelectionModel().getSelectedItem();
+        if (personnel != null && formation != null) {
+            DatabaseConnection.assignPersonnelToMission(personnel.getId(), formation.getId());
+            if (DatabaseConnection.validateMissionStatus(formation.getId())) {
+                DatabaseConnection.updateMissionStatus(formation.getId(), "Planifiée");
+            }
+            System.out.println("Affectation réussie !");
+        }
+        loadFormationData();
     }
 
     /**
