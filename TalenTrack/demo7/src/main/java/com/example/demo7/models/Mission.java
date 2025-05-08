@@ -11,14 +11,16 @@ public class Mission {
     private final ObjectProperty<LocalDate> dateDebut;
     private final IntegerProperty duree;
     private final StringProperty statut;
+    private final StringProperty type;
 
-    public Mission(int id, String nom, String description, LocalDate dateDebut, int duree, String statut) {
+    public Mission(int id, String nom, String description, LocalDate dateDebut, int duree, String statut, String type) {
         this.id = new SimpleIntegerProperty(id);
         this.nom = new SimpleStringProperty(nom);
         this.description = new SimpleStringProperty(description);
         this.dateDebut = new SimpleObjectProperty<>(dateDebut);
         this.duree = new SimpleIntegerProperty(duree);
         this.statut = new SimpleStringProperty(statut);
+        this.type = new SimpleStringProperty(type);
     }
 
 
@@ -28,6 +30,7 @@ public class Mission {
     public ObjectProperty dateDebutProperty() { return dateDebut; }
     public IntegerProperty dureeProperty() { return duree; }
     public StringProperty statutProperty() { return statut; }
+    public StringProperty typeProperty() { return type; }
 
     // Getters classiques
     public int getId() { return id.get(); }
@@ -36,6 +39,7 @@ public class Mission {
     public LocalDate getDateDebut() { return dateDebut.get(); }
     public int getDuree() { return duree.get(); }
     public String getStatut() { return statut.get(); }
+    public String getType() { return type.get(); }
 
     // Setters
     public void setId(int id) { this.id.set(id); }
@@ -44,6 +48,7 @@ public class Mission {
     public void setDateDebut(LocalDate dateDebut) { this.dateDebut.set(dateDebut); }
     public void setDuree(int duree) { this.duree.set(duree); }
     public void setStatut(String statut) { this.statut.set(statut); }
+    public void setType(String type) { this.type.set(type); }
 
     @Override
     public String toString() {

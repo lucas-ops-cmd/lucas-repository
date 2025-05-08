@@ -109,8 +109,6 @@
                         <ComboBox fx:id="comboMissions" style="-fx-pref-width: 300;" onAction="#loadMissionCompetences"/>
                     </HBox>
 
-
-
                     <Label text="Sugerer un employé :" style="-fx-font-weight: bold;"/>
                     <Button text="Sugerer" fx:id="btnSugererPersonel" onAction="#handleSugererPersonnel"/>
                     <ComboBox fx:id="comboPersoSugere"/>
@@ -146,6 +144,109 @@
                     </HBox>
                 </VBox>
             </Tab>
+
+            <!-- Onglets gestion des Formations -->
+            <Tab text="Gestion des formation">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <!-- Afficher formation -->
+                    <TableView fx:id="tableFormations" style="-fx-border-color: #ccc;">
+                        <columns>
+                            <TableColumn text="ID" fx:id="colFormationId" prefWidth="50"/>
+                            <TableColumn text="Nom" fx:id="colFormationNom" prefWidth="150"/>
+                            <TableColumn text="date début" fx:id="colDateDebutFor" prefWidth="80"/>
+                            <TableColumn text="durée" fx:id="colDureeFor" prefWidth="50"/>
+                            <TableColumn text="Personnel Affecté" fx:id="colFormationPersonnel" prefWidth="400"/>
+                            <TableColumn text="Statut" fx:id="colFormationStatut" prefWidth="100"/>
+                            <TableColumn text="Compétences" fx:id="colFormationCompetences" prefWidth="600"/>
+                        </columns>
+                    </TableView>
+                    <VBox spacing="10">
+                        <!-- Ajouter / modifier formation -->
+                        <Label text="Formulaire d'ajout et de modification de Formation"
+                               style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 5;"/>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Nom de la Formation :" style="-fx-min-width: 150;"/>
+                            <TextField fx:id="txtFormationName" promptText="Nom de la Formation" style="-fx-pref-width: 300;"/>
+                        </HBox>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Date de début :" style="-fx-min-width: 150;"/>
+                            <DatePicker fx:id="dpFormationStartDate"/>
+                        </HBox>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Durée (jours) :" style="-fx-min-width: 150;"/>
+                            <TextField fx:id="txtFormationDuration" promptText="Durée en jours" style="-fx-pref-width: 100;"/>
+                        </HBox>
+
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Nombre total de personnels requis :" style="-fx-min-width: 250;"/>
+                            <TextField fx:id="txtFormationNbrTotalRequis" promptText="Nombre total" style="-fx-pref-width: 100;"/>
+                        </HBox>
+
+                        <!-- Ajouter, Modifier / Supprimer formation button -->
+
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button text="Ajouter Formation" fx:id="btnAddFormation" onAction="#handleAddFormation"
+                                    style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <Button text="Modifier Formation" fx:id="btnUpdateFormation" onAction="#handleUpdateFormation"
+                                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <Button text="Supprimer Formation" fx:id="btnDeleteFormation" onAction="#handleDeleteFormation"
+                                    style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+            </Tab>
+
+            <!-- Onglet Afféctation des Formations -->
+            <Tab text="Afféctation des Formations">
+                <VBox spacing="20" style="-fx-padding: 20;">
+                    <!-- Affectation des competences -->
+                    <Label text="Affectation des Formations"
+                           style="-fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 5;"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Sélectionnez une formation :" style="-fx-min-width: 200;"/>
+                        <ComboBox fx:id="comboFormations" style="-fx-pref-width: 300;" onAction="#loadMissionCompetences"/>
+                    </HBox>
+
+
+                    <Label text="Sélectionner les compétences requises :" style="-fx-font-weight: bold;"/>
+                    <HBox spacing="10">
+
+                        <ComboBox fx:id="comboCompetencesFormation" style="-fx-pref-width: 200;"
+                                  onAction="#loadCompetences"/>
+                        <TextField fx:id="txtNbrPersonFor" promptText="Nombre de personnes requises" style="-fx-pref-width: 100;"/>
+
+                        <Button text="Ajouter" onAction="#handleAddCompetenceFormation"
+                                style="-fx-background-color: #27ae60; -fx-text-fill: white;"/>
+                        <Button text="Retirer" onAction="#handleDeleteCompetenceFormation"
+                                style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
+                    </HBox>
+                    <!-- Affichage des compétences d'une formations -->
+                    <TableView fx:id="tableCompetencesFormation" style="-fx-border-color: #ccc;" >
+                        <columns>
+                            <TableColumn text="Compétence" fx:id="colCompetenceFormation" prefWidth="200"/>
+                            <TableColumn text="Nombre de personnes requises" fx:id="colNbrPersonFormation" prefWidth="200"/>
+                        </columns>
+                    </TableView>
+
+                    <Label text="Affecter/Retirer un employé :" style="-fx-font-weight: bold;"/>
+
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <ComboBox fx:id="comboUsersFor" style="-fx-pref-width: 200;"/>
+                        <Button text="Affecter" fx:id="btnAffecterFormation" onAction="#handleAffecterFormation"
+                                style="-fx-background-color: #2980b9; -fx-text-fill: white;"/>
+                        <Button text="Retirer" fx:id="btnRetirerFormation" onAction="#handleRetirerFormation"
+                                style="-fx-background-color: #c0392b; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+
 
         </TabPane>
     </center>

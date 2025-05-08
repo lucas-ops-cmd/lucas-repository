@@ -22,12 +22,15 @@
                 <columns>
                     <TableColumn fx:id="colMissionId" text="ID"/>
                     <TableColumn fx:id="colMissionNom" text="Nom"/>
+                    <TableColumn text="date début" fx:id="colDateDebut" prefWidth="80"/>
+                    <TableColumn text="durée" fx:id="colDuree" prefWidth="50"/>
                     <TableColumn fx:id="colMissionDesc" text="Description"/>
                 </columns>
             </TableView>
 
             <!-- Bouton Retour -->
-            <Button fx:id="btnRetourAccueil" text="Retour à l'accueil" onAction="#handleRetourAccueil"/>
+            <Button fx:id="Déconnexion" text="Retour à l'accueil" onAction="#handleRetourAccueil"
+                    style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-font-weight: bold;"/>
 
         </VBox>
     </center>
